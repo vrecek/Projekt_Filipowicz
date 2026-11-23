@@ -1,11 +1,20 @@
 APP_TITLE = "System zamknięty"
 MODEL_NAME = "M/M/m/FIFO/N/F"
 
-WINDOW_RESOLUTION = "760x620"
-
 BANNER_BG = "#7a6a8f"
 BANNER_FG = "white"
 WINDOW_BG = "#eef3f4"
+
+PANEL_BG = "#f1f4f6"
+CARD_BG = "#ffffff"
+ROW_ALT_BG = "#f6f2f8"
+BORDER = "#d5dbe0"
+ACCENT = BANNER_BG
+TEXT = "#1f2933"
+MUTED = "#6b7280"
+GOOD_FG, GOOD_BG = "#1b5e20", "#e3f3e6"
+BAD_FG, BAD_BG = "#8c1d18", "#fdeceb"
+NEUTRAL_FG, NEUTRAL_BG = "#4b5563", "#e8ebee"
 
 RESULT_ROWS = [
     ("Wsp. obciążenia stanowiska obsługi", "ro"),

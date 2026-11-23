@@ -1,7 +1,17 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
+
 from ..dialogs import ParamsDialog
+from queue_app.metody.swietlik.optimization import FireflySettings, optimise_system
+from queue_app.metody.swietlik.results_view import ResultsPanel
 from ..widgets import ParamForm, vertical_separator
+
+
+def _to_float(text, name):
+    try:
+        return float(str(text).replace(",", "."))
+    except ValueError:
+        raise ValueError(f"Nieprawidłowa wartość: {name}.") from None
 
 
 class OptimizationTab(ttk.Frame):
@@ -21,6 +31,10 @@ class OptimizationTab(ttk.Frame):
         ])
         self.params.pack(fill="x")
 
+        self.optimise_n = tk.BooleanVar(value=False)
+        ttk.Checkbutton(left, text="Optymalizuj również N (zakres z ustawień parametrów)",
+                        variable=self.optimise_n).pack(anchor="w", pady=(4, 0))
+
         buttons = ttk.Frame(left)
         buttons.pack(fill="x", pady=(10, 0))
         buttons.columnconfigure(1, weight=1)
@@ -32,15 +46,14 @@ class OptimizationTab(ttk.Frame):
         vertical_separator(top)
 
         self.costs = ParamForm(top, [
-            ("Koszt C1", "1.00", 0.1),
-            ("Koszt C2", "4.00", 0.1),
+            ("Koszt C1 (kanał)", "1.00", 0.1),
+            ("Koszt C2 (kolejka)", "4.00", 0.1),
+            ("Zysk R (obsłużone zgł.)", "10.00", 0.1),
         ])
         self.costs.pack(side="left")
 
-        output = ttk.LabelFrame(self, text="")
-        output.pack(fill="both", expand=True, padx=10, pady=(5, 10))
-        self.output = tk.Text(output, state="disabled", relief="flat")
-        self.output.pack(fill="both", expand=True)
+        self.results = ResultsPanel(self)
+        self.results.pack(fill="both", expand=True, padx=10, pady=(5, 10))
 
         self.settings = ParamsDialog.DEFAULTS.copy()
 
@@ -50,28 +63,18 @@ class OptimizationTab(ttk.Frame):
         if dialog.result is not None:
             self.settings = dialog.result
 
-
-
     def optimise(self):
-        lam = float(self.params.vars[0][0].get())  # Intensywność strumienia zgłoszeń lam
-        mu = float(self.params.vars[1][0].get())  # Średnia intensywność obsługi
-        N = int(self.params.vars[2][0].get())  # Maksymalna liczba zgłoszeń
-
-        c1 = float(self.costs.vars[0][0].get())  # Koszt C1
-        c2 = float(self.costs.vars[1][0].get())  # Koszt C2
-
-        s = self.settings
-        iterations = int(s["iterations"])  # Ilość iteracji algorytmu
-        max_m = int(s["max_m"])  # Maksymalna wartość m
-        max_n = int(s["max_n"])  # Maksymalna wartość N
-        scouts = int(s["scouts"])  # Ilość skautów
-        best_sources = int(s["best_sources"])  # Ilość najlepszych źródeł
-        elite_sources = int(s["elite_sources"])  # Ilość elitarnych źródeł
-        bees_best = int(s["bees_best"])  # Ilość pszczół z najlepszymi źródłami
-        bees_elite = int(s["bees_elite"])  # Ilość pszczół z elitarnymi źródłami
-        neighbourhood = int(s["neighbourhood_searches"])  # Liczba przeszukiwań w sąsiedztwie
-
-        self.output.config(state="normal")
-        self.output.delete("1.0", "end")
-        self.output.insert("end", "m = 3, N = 6, koszt = 12.5\n")
-        self.output.config(state="disabled")
+        try:
+            lam = _to_float(self.params.vars[0][0].get(), "lam")
+            mu = _to_float(self.params.vars[1][0].get(), "intensywność obsługi")
+            n_fixed = int(_to_float(self.params.vars[2][0].get(), "liczba zgłoszeń"))
+            c1 = _to_float(self.costs.vars[0][0].get(), "koszt C1")
+            c2 = _to_float(self.costs.vars[1][0].get(), "koszt C2")
+            revenue = _to_float(self.costs.vars[2][0].get(), "zysk R")
+            settings = FireflySettings.from_dict(self.settings)
+            result = optimise_system(lam, mu, n_fixed, c1, c2, revenue,
+                                     self.optimise_n.get(), settings)
+        except ValueError as error:
+            messagebox.showerror("Błąd", str(error))
+            return
+        self.results.show(result)

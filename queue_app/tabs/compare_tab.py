@@ -1,4 +1,5 @@
 from tkinter import ttk
+
 from ..widgets import ParamForm, RangePanel, ResultsTable, vertical_separator
 
 
@@ -30,7 +31,6 @@ class CompareTab(ttk.Frame):
         self.results = ResultsTable(self, columns=2)
         self.results.pack(fill="both", expand=True, padx=10, pady=(5, 10))
 
-
     def compare(self):
         lam1 = float(self.params.vars[0][0].get())  # lam, System 1
         lam2 = float(self.params.vars[0][1].get())  # lam, System 2
@@ -44,7 +44,6 @@ class CompareTab(ttk.Frame):
         calc_probs = self.range_panel.calc_probabilities.get()  # "Oblicz prawdopodobieństwa" checkbox (bool)
         k_from = int(self.range_panel.range_from.get())  # "od"
         k_to = int(self.range_panel.range_to.get())  # "do"
-
 
         ro1 = 1
         ro2 = 2
@@ -77,3 +76,4 @@ class CompareTab(ttk.Frame):
         self.results.set("tf_śr", tf_sr1, tf_sr2)
         self.results.set("ts_śr", ts_sr1, ts_sr2)
         self.results.set("m0_śr", m0_sr1, m0_sr2)
+

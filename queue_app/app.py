@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from .constants import APP_TITLE, BANNER_BG, BANNER_FG, MODEL_NAME, WINDOW_BG, WINDOW_RESOLUTION
+from .constants import APP_TITLE, BANNER_BG, BANNER_FG, MODEL_NAME, WINDOW_BG
 from .tabs import AnalysisTab, CompareTab, OptimizationTab
 
 
@@ -9,7 +9,7 @@ class QueueApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP_TITLE)
-        self.geometry(WINDOW_RESOLUTION)
+        self.geometry("800x600")
         self.configure(bg=WINDOW_BG)
 
         tk.Label(self, text=MODEL_NAME, bg=BANNER_BG, fg=BANNER_FG,

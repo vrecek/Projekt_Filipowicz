@@ -1,4 +1,5 @@
 from tkinter import ttk
+
 from ..widgets import ParamForm, RangePanel, ResultsTable, vertical_separator
 
 
@@ -25,18 +26,15 @@ class AnalysisTab(ttk.Frame):
         self.results = ResultsTable(self, columns=1)
         self.results.pack(fill="both", expand=True, padx=10, pady=(5, 10))
 
-
     def analyse(self):
         lam = float(self.params.vars[0][0].get())  # Intensywność strumienia zgłoszeń lam
-        mu  = float(self.params.vars[1][0].get())  # Średnia intensywność obsługi mi
-        m   = int(self.params.vars[2][0].get())  # Liczba kanałów obsługi
-        N   = int(self.params.vars[3][0].get())  # Maksymalna liczba zgłoszeń
+        mu = float(self.params.vars[1][0].get())  # Średnia intensywność obsługi mi
+        m = int(self.params.vars[2][0].get())  # Liczba kanałów obsługi
+        N = int(self.params.vars[3][0].get())  # Maksymalna liczba zgłoszeń
 
         calc_probs = self.range_panel.calc_probabilities.get()  # Oblicz prawdopodobieństwa checkbox (bool)
-        k_from     = int(self.range_panel.range_from.get())  # od
-        k_to       = int(self.range_panel.range_to.get())  # do
-
-
+        k_from = int(self.range_panel.range_from.get())  # od
+        k_to = int(self.range_panel.range_to.get())  # do
 
         print(lam, mu, m, N, calc_probs, k_from, k_to)
 
@@ -61,3 +59,4 @@ class AnalysisTab(ttk.Frame):
         self.results.set("tf_śr", tf_sr)
         self.results.set("ts_śr", ts_sr)
         self.results.set("m0_śr", m0_sr)
+

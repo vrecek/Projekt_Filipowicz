@@ -1,38 +1,35 @@
-"""Modal 'Dialog' with the optimisation algorithm settings."""
-
 import tkinter as tk
 from tkinter import ttk
 
-# (section title, [(settings key, label), ...])
+from queue_app.metody.swietlik.optimization import GAMMA_MODES
+
 SECTIONS = [
     ("Parametry ogólne", [
-        ("iterations", "Ilość iteracji algorytmu"),
-        ("max_m", "Maksymalna wartość m:"),
-        ("max_n", "Maksymalna wartość N:"),
+        ("iterations", "Ilość iteracji algorytmu", 40, 1),
+        ("min_m", "Minimalna wartość m:", 1, 1),
+        ("max_m", "Maksymalna wartość m:", 100, 1),
+        ("min_n", "Minimalna wartość N:", 1, 1),
+        ("max_n", "Maksymalna wartość N:", 100, 1),
+        ("seed", "Ziarno generatora (0 = losowe):", 0, 1),
     ]),
     ("Parametry optymalizacji", [
-        ("scouts", "Ilość skautów"),
-        ("best_sources", "Ilość najlepszych źródeł"),
-        ("elite_sources", "Ilość elitarnych źródeł"),
-        ("bees_best", "Ilość pszczół z najlepszymi źródłami"),
-        ("bees_elite", "Ilość pszczół z elitarnymi źródłami"),
-        ("neighbourhood_searches", "Liczba przeszukiwań w sąsiedztwie"),
+        ("fireflies", "Rozmiar roju (ilość świetlików):", 30, 1),
+        ("beta0", "Maksimum atrakcyjności β0 ∈ [0, 1]:", 1.0, 0.1),
+        ("gamma_mode", "Współczynnik absorpcji:", "adaptacyjne γ0 / r_max²",
+         list(GAMMA_MODES)),
+        ("gamma", "γ (stałe) lub γ0 ∈ [0, 1] (adaptacyjne):", 0.8, 0.1),
+        ("u_min", "Krok losowy: min u (ułamek zakresu):", -0.05, 0.01),
+        ("u_max", "Krok losowy: max u (ułamek zakresu):", 0.05, 0.01),
     ]),
 ]
 
 
+def _build_defaults():
+    return {field[0]: field[2] for _, fields in SECTIONS for field in fields}
+
+
 class ParamsDialog(tk.Toplevel):
-    DEFAULTS = {
-        "iterations": 40,
-        "max_m": 100,
-        "max_n": 100,
-        "scouts": 30,
-        "best_sources": 15,
-        "elite_sources": 5,
-        "bees_best": 10,
-        "bees_elite": 15,
-        "neighbourhood_searches": 10,
-    }
+    DEFAULTS = _build_defaults()
 
     def __init__(self, parent, values=None):
         super().__init__(parent)
@@ -40,7 +37,7 @@ class ParamsDialog(tk.Toplevel):
         self.resizable(False, False)
         self.transient(parent)
 
-        self.result = None  # dict after OK, None after Cancel
+        self.result = None
         values = values or self.DEFAULTS
         self._vars = {}
 
@@ -52,12 +49,17 @@ class ParamsDialog(tk.Toplevel):
             frame = ttk.LabelFrame(body, text=title, padding=(10, 5))
             frame.grid(row=row, column=0, sticky="ew", pady=(0, 10))
             frame.columnconfigure(0, weight=1)
-            for i, (key, label) in enumerate(fields):
+            for i, (key, label, default, step) in enumerate(fields):
                 var = tk.StringVar(value=str(values[key]))
                 self._vars[key] = var
                 ttk.Label(frame, text=label).grid(row=i, column=0, sticky="e", padx=(0, 8), pady=4)
-                ttk.Spinbox(frame, textvariable=var, from_=0, to=9999,
-                            width=7).grid(row=i, column=1, pady=4)
+                if isinstance(step, list):
+                    widget = ttk.Combobox(frame, textvariable=var, values=step,
+                                          state="readonly", width=22)
+                else:
+                    widget = ttk.Spinbox(frame, textvariable=var, from_=-9999, to=9999,
+                                         increment=step, width=8)
+                widget.grid(row=i, column=1, pady=4, sticky="w")
 
         buttons = ttk.Frame(body)
         buttons.grid(row=len(SECTIONS), column=0, pady=(5, 0))
