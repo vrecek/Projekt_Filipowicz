@@ -1,28 +1,21 @@
-\# Uruchomienie
+# Uruchomienie
 
 
 
-1\.
+### 1.
 
-'''bash
-
+```bash
 python main.py
+```
 
-'''
+### 2.
 
-
-
-2\.
-
-'''bash
-
+```bash
 python3 main.py
+```
 
-'''
-
-
-
-3\. Run "main.py" (PyCharm)
+### 3. 
+Run "main.py" (PyCharm)
 
 
 
